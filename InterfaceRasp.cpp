@@ -26,11 +26,13 @@ RaspInterface::RaspInterface() {
     timer.setTimer(0);
     state = INPUT_WAIT;
     pumpToHeater_delay = 5;
-    timeout_delay = 30;
+    timeout_delay = 600;
     timeout = true;
     pump = heater = false;
     timer_reset = setup = false;
     timer_ending = false;
+    serial_request = false;
+    already_registered = false;
     pSetupKey = 0;
     pSetupPlus = 1;
     pSetupMin = 2;
@@ -53,7 +55,7 @@ RaspInterface::~RaspInterface()
 }
 
 void RaspInterface::outputs() {
-
+    timeHandler();
     if (setup) {
         if (!setupWritten) {
             defaultWritten = false;
@@ -92,6 +94,7 @@ void RaspInterface::outputs() {
 }
 
 void RaspInterface::inputs() {
+    timeHandler();
     setup = digitalRead(pSetupKey);
     timer_reset = digitalRead(pReset);
     SetupPlus = digitalRead(pSetupPlus);
@@ -108,7 +111,6 @@ void RaspInterface::inputs() {
             SetupMin = false;
         }
     }
-    timeHandler();
 }
 
 void RaspInterface::timeHandler() {

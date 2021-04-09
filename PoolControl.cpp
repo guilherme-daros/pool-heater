@@ -24,7 +24,8 @@ public:
     ClockCalendar cc;
     string buff;
     int state, pumpToHeater_delay, timeout_delay;
-    bool timeout, pump, heater, timer_reset, setup, timer_ending, serial_request;
+    bool timeout, pump, heater, timer_reset, setup, timer_ending;
+    bool already_registered, serial_request;
 
     void virtual inputs() = 0;
     void virtual outputs() = 0;
@@ -42,6 +43,7 @@ void PoolControl::FSM() {
         else {
             state = INPUT_WAIT;
         }
+
         if (timer_reset) {
             state = RESET;
             break;
@@ -100,14 +102,15 @@ void PoolControl::FSM() {
         else {
             state = INIT_PUMP;
         }
-        buff += cc.getTime();
-        buff += '-';
-        buff += cc.getDate();
-        buff += '-';
-        buff += 'I';
-        log.push(buff);
-        std::cout << buff << std::endl;
-        buff = " ";
+        if (!already_registered)
+        {
+            already_registered = true;
+            buff += "Init - ";
+            buff += cc.getDateTime();
+            log.push(buff);
+            std::cout << buff << std::endl;
+            buff = "";
+        }
 
         if (timer_reset) {
             state = RESET;
@@ -211,14 +214,12 @@ void PoolControl::FSM() {
         else {
             state = SHUTDOWN_PUMP;
         }
-        buff += cc.getTime();
-        buff += '-';
-        buff += cc.getDate();
-        buff += '-';
-        buff += 'S';
+        buff += "Shutdown - ";
+        buff += cc.getDateTime();
         log.push(buff);
+        already_registered = false;
         std::cout << buff << std::endl;
-        buff = " ";
+        buff = "";
         if (pump) pump = false;
         state = INPUT_WAIT;
         break;
