@@ -173,6 +173,13 @@ void PoolControl::FSM() {
         }
         break;
     case SHUTDOWN_HEATER:
+        if (timer_reset) {
+            state = RESET;
+            break;
+        }
+        else {
+            state = SHUTDOWN_HEATER;
+        }
         if (serial_request) {
             state = SERIAL_OUT;
             break;
@@ -190,6 +197,13 @@ void PoolControl::FSM() {
         }
         break;
     case SHUTDOWN_PUMP:
+        if (timer_reset) {
+            state = RESET;
+            break;
+        }
+        else {
+            state = SHUTDOWN_PUMP;
+        }
         if (serial_request) {
             state = SERIAL_OUT;
             break;
