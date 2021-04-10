@@ -39,9 +39,6 @@ std::string ClockCalendar::getDate() {
 
 std::string ClockCalendar::getDateTime() {
     std::time_t t = std::time(0);
-    char* now = std::ctime(&t) - '\n';
-    now -= now[strlen(now) - 1];
-    now += '\r';
-    now += '\n';
+    char* now = std::ctime(&t);
     return now;
 }

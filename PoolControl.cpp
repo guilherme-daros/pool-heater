@@ -97,7 +97,7 @@ void PoolControl::FSM() {
         if (pump) {
             buff.clear();
             buff.str("");
-            buff << ' ';
+            buff << " - ";
             buff << id;
             buff << " - ReInit - ";
             buff << cc.getDateTime();
@@ -123,7 +123,7 @@ void PoolControl::FSM() {
             buff.clear();
             buff.str("");
             already_registered = true;
-            buff << ' ';
+            buff << " - ";
             buff << id;
             buff << " - Init - ";
             buff << cc.getDateTime();
@@ -239,7 +239,7 @@ void PoolControl::FSM() {
         }
         buff.clear();
         buff.str("");
-        buff << ' ';
+        buff << " - ";
         buff << id;
         buff << " - Shutdown - ";
         buff << cc.getDateTime();
