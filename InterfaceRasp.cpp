@@ -139,4 +139,5 @@ void RaspInterface::serialOut() {
     string initmsg = "Starting Serial Communication";
     write(fd, initmsg, strlen(initmsg));
     write(fd, tmp, strlen(tmp));
+    close(fd);
 }
