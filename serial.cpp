@@ -1,22 +1,27 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <termios.h>
+#include <cstring>
+#include <iostream>
+#include <string>
+using namespace std;
 
 int main(int argc, char* argv[]) {
 
+
     struct termios serial;
-    char str[] = { 'h','e','l','l','o' };
-    char buffer[10];
+    string str_obj = "GeeksForGeeks";
+    char* str = &str_obj[0];
+    char buffer[15];
 
     if (argc == 1) {
-        printf("Usage: %s [device]\n\n", argv[0]);
+        cout << "Usage: " << argv[0] << "[device]" << endl;
         return -1;
     }
 
-    printf("Opening %s\n", argv[1]);
+    cout << "Opening " << argv[1] << endl;
 
     int fd = open(argv[1], O_RDWR | O_NOCTTY | O_NDELAY);
 
@@ -44,7 +49,7 @@ int main(int argc, char* argv[]) {
     tcsetattr(fd, TCSANOW, &serial); // Apply configuration
 
     // Attempt to send and receive
-    printf("Sending: %s\n", str);
+    cout << "Sending: " << str << endl;;
 
     int wcount = write(fd, str, strlen(str));
     if (wcount < 0) {
@@ -52,7 +57,7 @@ int main(int argc, char* argv[]) {
         return -1;
     }
     else {
-        printf("Sent %d characters\n", wcount);
+        cout << "Sent " << wcount << " characters" << endl;
     }
 
     int rcount = read(fd, buffer, sizeof(buffer));
@@ -61,12 +66,11 @@ int main(int argc, char* argv[]) {
         return -1;
     }
     else {
-        printf("Received %d characters\n", rcount);
+        cout << "Received: " << rcount << " characters" << endl;
     }
 
     buffer[rcount] = '\0';
-
-    printf("Received: %s\n", buffer);
+    cout << "Received: " << buffer << endl;
 
     close(fd);
 }
