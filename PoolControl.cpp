@@ -1,6 +1,9 @@
 #include "Timer.cpp"
 #include "Queue.cpp"
 #include "ClockCalendar.cpp"
+#include <sstream>
+#include <iostream>
+#include <string>
 
 class PoolControl {
 public:
@@ -22,7 +25,7 @@ public:
     Timer timer;
     Queue log;
     ClockCalendar cc;
-    string buff;
+    ostringstream buff;
     int state, pumpToHeater_delay, timeout_delay;
     bool timeout, pump, heater, timer_reset, setup, timer_ending;
     bool already_registered, serial_request;
@@ -86,7 +89,15 @@ void PoolControl::FSM() {
         else {
             state = RESET;
         }
-
+        if (pump) {
+            buff.clear();
+            buff.str("");
+            buff << id;
+            buff << " - ReInit - ";
+            buff << cc.getDateTime();
+            log.push(buff.str());
+            std::cout << buff.str();
+        }
         timer_reset = false;
         timer_ending = false;
         timer.setTimer(timeout_delay);
@@ -102,18 +113,20 @@ void PoolControl::FSM() {
         else {
             state = INIT_PUMP;
         }
-        if (!already_registered)
-        {
+        if (!already_registered) {
+            buff.clear();
+            buff.str("");
             already_registered = true;
-            buff += "Init - ";
-            buff += cc.getDateTime();
-            log.push(buff);
-            std::cout << buff << std::endl;
-            buff = "";
+            buff << id;
+            buff << " - Init - ";
+            buff << cc.getDateTime();
+            log.push(buff.str());
+            std::cout << buff.str();
         }
 
         if (timer_reset) {
             state = RESET;
+            break;
         }
         timeout = false;
         if (!pump) {
@@ -214,12 +227,14 @@ void PoolControl::FSM() {
         else {
             state = SHUTDOWN_PUMP;
         }
-        buff += "Shutdown - ";
-        buff += cc.getDateTime();
-        log.push(buff);
+        buff.clear();
+        buff.str("");
+        buff << id;
+        buff << " - Shutdown - ";
+        buff << cc.getDateTime();
+        log.push(buff.str());
         already_registered = false;
-        std::cout << buff << std::endl;
-        buff = "";
+        std::cout << buff.str();
         if (pump) pump = false;
         state = INPUT_WAIT;
         break;

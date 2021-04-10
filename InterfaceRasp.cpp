@@ -26,7 +26,7 @@ RaspInterface::RaspInterface() {
     timer.setTimer(0);
     state = INPUT_WAIT;
     pumpToHeater_delay = 5;
-    timeout_delay = 600;
+    timeout_delay = 30;
     timeout = true;
     pump = heater = false;
     timer_reset = setup = false;
