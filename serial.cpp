@@ -11,7 +11,7 @@ using namespace std;
 int main(int argc, char* argv[]) {
 
 
-    struct termios serial;
+    termios serial;
     string str_obj = "GeeksForGeeks";
     char* str = &str_obj[0];
     char buffer[15];
