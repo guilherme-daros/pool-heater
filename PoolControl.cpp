@@ -251,7 +251,6 @@ void PoolControl::FSM() {
     case SERIAL_OUT:
         if (log.head != 0) {
             state = SERIAL_OUT;
-            PoolControl->serialOut();
         }
         else {
             serial_request = false;

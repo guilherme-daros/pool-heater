@@ -16,6 +16,9 @@ private:
 public:
     RaspInterface();
     ~RaspInterface();
+    void inputs();
+    void outputs();
+    void serialOut();
 
 };
 
@@ -124,20 +127,21 @@ void RaspInterface::timeHandler() {
 }
 
 void RaspInterface::serialOut() {
-
-    int fd = open(serialPort, O_RDWR | O_NOCTTY | O_NDELAY);
-    tcgetattr(fd, &serial);
-    serial.c_iflag = 0;
-    serial.c_oflag = 0;
-    serial.c_lflag = 0;
-    serial.c_cflag = 0;
-    serial.c_cc[VMIN] = 0;
-    serial.c_cc[VTIME] = 0;
-    serial.c_cflag = B115200 | CS8 | CREAD;
-    tcsetattr(fd, TCSANOW, &serial);
-    string tmp = log.pop();
-    string initmsg = "Starting Serial Communication";
-    write(fd, initmsg, strlen(initmsg));
-    write(fd, tmp, strlen(tmp));
-    close(fd);
+    if (serial_request) {
+        int fd = open(serialPort, O_RDWR | O_NOCTTY | O_NDELAY);
+        tcgetattr(fd, &serial);
+        serial.c_iflag = 0;
+        serial.c_oflag = 0;
+        serial.c_lflag = 0;
+        serial.c_cflag = 0;
+        serial.c_cc[VMIN] = 0;
+        serial.c_cc[VTIME] = 0;
+        serial.c_cflag = B115200 | CS8 | CREAD;
+        tcsetattr(fd, TCSANOW, &serial);
+        string tmp = log.pop();
+        string initmsg = "Starting Serial Communication";
+        write(fd, initmsg, strlen(initmsg));
+        write(fd, tmp, strlen(tmp));
+        close(fd);
+    }
 }

@@ -11,5 +11,6 @@ int main() {
         Interface.FSM();
         Interface.outputs();
         Interface.inputs();
+        Interface.serialOut();
     }
 }
