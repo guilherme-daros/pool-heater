@@ -1,3 +1,7 @@
+#include <unistd.h>
+#include <fcntl.h>
+#include <termios.h>
+#include <cstring>
 #include <iostream>
 #include "PoolControl.cpp"
 #include "lcdDisplay.cpp"
@@ -7,11 +11,12 @@ class RaspInterface : public PoolControl {
 private:
     double time_last_millis;
     LCD display;
-    string serialPort = "/dev/ttyGS0";
+    const char* initmsg = "Starting Serial Communication with 93457826\r\n";
+    const char* serialPort = "/dev/ttyGS0";
     termios serial;
     void timeHandler();
     unsigned int pSetupKey, pSetupPlus, pSetupMin, pReset, pBuzzer, pPump, pHeater, pSerial;
-    bool SetupPlus, SetupMin, setupWritten, defaultWritten;
+    bool SetupPlus, SetupMin, setupWritten, defaultWritten, init;
 
 public:
     RaspInterface();
@@ -36,6 +41,7 @@ RaspInterface::RaspInterface() {
     timer_ending = false;
     serial_request = false;
     already_registered = false;
+    init = false;
     pSetupKey = 0;
     pSetupPlus = 1;
     pSetupMin = 2;
@@ -61,6 +67,7 @@ RaspInterface::~RaspInterface()
 
 void RaspInterface::outputs() {
     timeHandler();
+
     if (setup) {
         if (!setupWritten) {
             defaultWritten = false;
@@ -127,7 +134,7 @@ void RaspInterface::timeHandler() {
 }
 
 void RaspInterface::serialOut() {
-    if (serial_request) {
+    if (serial_request && log.head != 0) {
         int fd = open(serialPort, O_RDWR | O_NOCTTY | O_NDELAY);
         tcgetattr(fd, &serial);
         serial.c_iflag = 0;
@@ -138,10 +145,13 @@ void RaspInterface::serialOut() {
         serial.c_cc[VTIME] = 0;
         serial.c_cflag = B115200 | CS8 | CREAD;
         tcsetattr(fd, TCSANOW, &serial);
-        string tmp = log.pop();
-        string initmsg = "Starting Serial Communication";
-        write(fd, initmsg, strlen(initmsg));
+        char* tmp = &log.pop()[0];
+        if (!init) {
+            write(fd, initmsg, strlen(initmsg));
+            init = true;
+        }
         write(fd, tmp, strlen(tmp));
+        delay(100);
         close(fd);
     }
 }

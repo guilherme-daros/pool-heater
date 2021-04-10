@@ -1,4 +1,5 @@
 #include <ctime>
+#include <cstring>
 #include <sstream>
 #include <iostream>
 #include <string>
@@ -38,6 +39,9 @@ std::string ClockCalendar::getDate() {
 
 std::string ClockCalendar::getDateTime() {
     std::time_t t = std::time(0);
-    std::string now = std::ctime(&t);
+    char* now = std::ctime(&t) - '\n';
+    now -= now[strlen(now) - 1];
+    now += '\r';
+    now += '\n';
     return now;
 }

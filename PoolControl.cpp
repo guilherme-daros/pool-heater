@@ -21,7 +21,7 @@ public:
         SERIAL_OUT
     };
     const int min = 60;
-    const int id = 93457826;
+    const char* id = "93457826";
     Timer timer;
     Queue log;
     states last_state;
@@ -97,11 +97,11 @@ void PoolControl::FSM() {
         if (pump) {
             buff.clear();
             buff.str("");
+            buff << ' ';
             buff << id;
             buff << " - ReInit - ";
             buff << cc.getDateTime();
             log.push(buff.str());
-            std::cout << buff.str();
         }
         timer_reset = false;
         timer_ending = false;
@@ -123,11 +123,11 @@ void PoolControl::FSM() {
             buff.clear();
             buff.str("");
             already_registered = true;
+            buff << ' ';
             buff << id;
             buff << " - Init - ";
             buff << cc.getDateTime();
             log.push(buff.str());
-            std::cout << buff.str();
         }
 
         if (timer_reset) {
@@ -239,12 +239,12 @@ void PoolControl::FSM() {
         }
         buff.clear();
         buff.str("");
+        buff << ' ';
         buff << id;
         buff << " - Shutdown - ";
         buff << cc.getDateTime();
         log.push(buff.str());
         already_registered = false;
-        std::cout << buff.str();
         if (pump) pump = false;
         state = INPUT_WAIT;
         break;
