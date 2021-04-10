@@ -24,6 +24,7 @@ public:
     const int id = 93457826;
     Timer timer;
     Queue log;
+    states last_state;
     ClockCalendar cc;
     ostringstream buff;
     int state, pumpToHeater_delay, timeout_delay;
@@ -32,6 +33,7 @@ public:
 
     void virtual inputs() = 0;
     void virtual outputs() = 0;
+    void virtual serialOut() = 0;
 };
 
 void PoolControl::FSM() {
@@ -41,6 +43,7 @@ void PoolControl::FSM() {
     case INPUT_WAIT:
         if (serial_request) {
             state = SERIAL_OUT;
+            last_state = INPUT_WAIT;
             break;
         }
         else {
@@ -67,6 +70,7 @@ void PoolControl::FSM() {
     case SETUP:
         if (serial_request) {
             state = SERIAL_OUT;
+            last_state = SETUP;
             break;
         }
         else {
@@ -84,6 +88,7 @@ void PoolControl::FSM() {
     case RESET:
         if (serial_request) {
             state = SERIAL_OUT;
+            last_state = RESET;
             break;
         }
         else {
@@ -108,6 +113,7 @@ void PoolControl::FSM() {
     case INIT_PUMP:
         if (serial_request) {
             state = SERIAL_OUT;
+            last_state = INIT_PUMP;
             break;
         }
         else {
@@ -143,6 +149,7 @@ void PoolControl::FSM() {
     case INIT_HEATER:
         if (serial_request) {
             state = SERIAL_OUT;
+            last_state = INIT_HEATER;
             break;
         }
         else {
@@ -161,6 +168,7 @@ void PoolControl::FSM() {
     case TIMEOUT_WAIT:
         if (serial_request) {
             state = SERIAL_OUT;
+            last_state = TIMEOUT_WAIT;
             break;
         }
         else {
@@ -198,6 +206,7 @@ void PoolControl::FSM() {
         }
         if (serial_request) {
             state = SERIAL_OUT;
+            last_state = SHUTDOWN_HEATER;
             break;
         }
         else {
@@ -222,6 +231,7 @@ void PoolControl::FSM() {
         }
         if (serial_request) {
             state = SERIAL_OUT;
+            last_state = SHUTDOWN_PUMP;
             break;
         }
         else {
@@ -239,7 +249,13 @@ void PoolControl::FSM() {
         state = INPUT_WAIT;
         break;
     case SERIAL_OUT:
-        while (log.head != 0) {
+        if (log.head != 0) {
+            state = SERIAL_OUT;
+            PoolControl->serialOut();
+        }
+        else {
+            serial_request = false;
+            state = last_state;
         }
     default:
         break;

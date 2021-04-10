@@ -7,16 +7,16 @@ class RaspInterface : public PoolControl {
 private:
     double time_last_millis;
     LCD display;
+    string serialPort = "/dev/ttyGS0";
+    termios serial;
     void timeHandler();
-    int pSetupKey, pSetupPlus, pSetupMin, pReset, pBuzzer, pPump, pHeater;
+    unsigned int pSetupKey, pSetupPlus, pSetupMin, pReset, pBuzzer, pPump, pHeater, pSerial;
     bool SetupPlus, SetupMin, setupWritten, defaultWritten;
 
 public:
     RaspInterface();
     ~RaspInterface();
 
-    void inputs();
-    void outputs();
 };
 
 RaspInterface::RaspInterface() {
@@ -40,6 +40,7 @@ RaspInterface::RaspInterface() {
     pBuzzer = 4;
     pPump = 5;
     pHeater = 6;
+    pSerial = 7;
     pinMode(pSetupKey, INPUT);
     pinMode(pSetupPlus, INPUT);
     pinMode(pSetupMin, INPUT);
@@ -47,6 +48,7 @@ RaspInterface::RaspInterface() {
     pinMode(pBuzzer, OUTPUT);
     pinMode(pPump, OUTPUT);
     pinMode(pHeater, OUTPUT);
+    pinMode(pSerial, INPUT);
 }
 
 
@@ -95,6 +97,7 @@ void RaspInterface::outputs() {
 
 void RaspInterface::inputs() {
     timeHandler();
+    serial_request = digitalRead(pSerial);
     setup = digitalRead(pSetupKey);
     timer_reset = digitalRead(pReset);
     SetupPlus = digitalRead(pSetupPlus);
@@ -118,4 +121,22 @@ void RaspInterface::timeHandler() {
         timer.setTimer(timer.getTime() - 1);
         time_last_millis = millis();
     }
+}
+
+void RaspInterface::serialOut() {
+
+    int fd = open(serialPort, O_RDWR | O_NOCTTY | O_NDELAY);
+    tcgetattr(fd, &serial);
+    serial.c_iflag = 0;
+    serial.c_oflag = 0;
+    serial.c_lflag = 0;
+    serial.c_cflag = 0;
+    serial.c_cc[VMIN] = 0;
+    serial.c_cc[VTIME] = 0;
+    serial.c_cflag = B115200 | CS8 | CREAD;
+    tcsetattr(fd, TCSANOW, &serial);
+    string tmp = log.pop();
+    string initmsg = "Starting Serial Communication";
+    write(fd, initmsg, strlen(initmsg));
+    write(fd, tmp, strlen(tmp));
 }

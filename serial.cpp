@@ -59,7 +59,7 @@ int main(int argc, char* argv[]) {
     else {
         cout << "Sent " << wcount << " characters" << endl;
     }
-
+    for (;;);
     int rcount = read(fd, buffer, sizeof(buffer));
     if (rcount < 0) {
         perror("Read");
