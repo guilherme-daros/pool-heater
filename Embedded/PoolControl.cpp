@@ -23,7 +23,7 @@ public:
     const int min = 60;
     const char* id = "93457826";
     Timer timer;
-    Queue log;
+    Queue logger;
     states last_state;
     ClockCalendar cc;
     ostringstream buff;
@@ -101,7 +101,7 @@ void PoolControl::FSM() {
             buff << id;
             buff << " - ReInit - ";
             buff << cc.getDateTime();
-            log.push(buff.str());
+            logger.push(buff.str());
         }
         timer_reset = false;
         timer_ending = false;
@@ -127,7 +127,7 @@ void PoolControl::FSM() {
             buff << id;
             buff << " - Init - ";
             buff << cc.getDateTime();
-            log.push(buff.str());
+            logger.push(buff.str());
         }
 
         if (timer_reset) {
@@ -243,13 +243,13 @@ void PoolControl::FSM() {
         buff << id;
         buff << " - Shutdown - ";
         buff << cc.getDateTime();
-        log.push(buff.str());
+        logger.push(buff.str());
         already_registered = false;
         if (pump) pump = false;
         state = INPUT_WAIT;
         break;
     case SERIAL_OUT:
-        if (log.head != 0) {
+        if (logger.head != 0) {
             state = SERIAL_OUT;
         }
         else {
