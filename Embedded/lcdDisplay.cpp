@@ -1,15 +1,15 @@
-#include <wiringPiI2C.h>
-#include <wiringPi.h>
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <wiringPi.h>
+#include <wiringPiI2C.h>
 
-#define I2C_ADDR   0x27 
-#define LCD_CHR  1 
-#define LCD_CMD  0 
-#define LINE1  0x80 
-#define LINE2  0xC0 
-#define LCD_BACKLIGHT   0x08  
-#define ENABLE  0b00000100 
+#define I2C_ADDR 0x27
+#define LCD_CHR 1
+#define LCD_CMD 0
+#define LINE1 0x80
+#define LINE2 0xC0
+#define LCD_BACKLIGHT 0x08
+#define ENABLE 0b00000100
 
 class LCD {
 private:
@@ -23,7 +23,7 @@ public:
   ~LCD();
   void typeInt(int);
   void typeFloat(float);
-  void typeln(const char*);
+  void typeln(const char *);
   void typeChar(char);
   void lcdLoc(int);
   void ClrLcd(void);
@@ -36,7 +36,6 @@ LCD::LCD() {
 }
 
 LCD::~LCD() {}
-
 
 // prints float values
 void LCD::typeFloat(float myFloat) {
@@ -52,32 +51,26 @@ void LCD::typeInt(int i) {
   typeln(array1);
 }
 
-// clear lcd go home 
+// clear lcd go home
 void LCD::ClrLcd(void) {
   lcd_byte(0x01, LCD_CMD);
   lcd_byte(0x02, LCD_CMD);
 }
 
 // go to location on LCD
-void LCD::lcdLoc(int line) {
-  lcd_byte(line, LCD_CMD);
-}
+void LCD::lcdLoc(int line) { lcd_byte(line, LCD_CMD); }
 
 // out char to LCD at current position
-void LCD::typeChar(char val) {
-
-  lcd_byte(val, LCD_CHR);
-}
-
+void LCD::typeChar(char val) { lcd_byte(val, LCD_CHR); }
 
 // this allows use of any size string
-void LCD::typeln(const char* s) {
+void LCD::typeln(const char *s) {
 
-  while (*s) lcd_byte(*(s++), LCD_CHR);
-
+  while (*s)
+    lcd_byte(*(s++), LCD_CHR);
 }
 
-//Send byte to data pins
+// Send byte to data pins
 void LCD::lcd_byte(int bits, int mode) {
   // bits = the data
   // mode = 1 for data, 0 for command

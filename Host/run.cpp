@@ -5,11 +5,11 @@
   •listar o período do dia com mais utilização do sistema de controle.
 */
 
-#include <iostream>
-#include <ctime>
-#include <string>
-#include "SerialWindows.cpp"
 #include "List.cpp"
+#include "SerialWindows.cpp"
+#include <ctime>
+#include <iostream>
+#include <string>
 
 using namespace std;
 
@@ -23,17 +23,15 @@ List logger;
 unsigned char data;
 int sel;
 
-
-
 int main() {
   buffer << " ";
-  while(1){
+  while (1) {
     serial.flush();
-    while(buffer.str() != ""){
+    while (buffer.str() != "") {
       buffer.clear();
       buffer.str("");
-      while(data != '\n'){
-        serial.read(data,1);
+      while (data != '\n') {
+        serial.read(data, 1);
         buffer << data;
       }
       logger.insertBeforeFirst(buffer.str());
@@ -47,8 +45,7 @@ int main() {
     cout << "Option: ";
     cin >> sel;
     string time1, time2;
-    switch (sel)
-    {
+    switch (sel) {
     case 0:
       system("PAUSE");
       return 0;
@@ -76,5 +73,3 @@ int main() {
     }
   }
 }
-
- 
